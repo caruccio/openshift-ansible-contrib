@@ -25,6 +25,7 @@
       MasterHealthTarget: "TCP:{{ console_port }}"
       MasterClusterHostname: "{{ openshift_master_cluster_hostname }}"
       MasterClusterPublicHostname: "{{ openshift_master_cluster_public_hostname }}"
+      Route53AppHostedZone: "{{ wildcard_zone }}"
       AppWildcardDomain: "*.{{ wildcard_zone }}"
       VpcCidrBlock: "{{ cidr_block }}"
       VpcName: "{{ vpc_prefix }}"
