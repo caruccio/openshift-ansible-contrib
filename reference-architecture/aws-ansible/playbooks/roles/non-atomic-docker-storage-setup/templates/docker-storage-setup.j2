@@ -1,4 +1,5 @@
 DEVS='/dev/xvdb'
 VG=docker_vol
 DATA_SIZE=95%VG
-STORAGE_DRIVER=overlay2
+STORAGE_DRIVER=devicemapper
+EXTRA_DOCKER_STORAGE_OPTIONS='--storage-driver devicemapper --storage-opt dm.fs=xfs --storage-opt dm.thinpooldev=/dev/mapper/docker_vg-docker--pool'

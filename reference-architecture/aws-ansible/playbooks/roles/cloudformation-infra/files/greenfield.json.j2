@@ -35,6 +35,9 @@
     "MasterClusterHostname": {
       "Type": "String"
     },
+    "Route53AppHostedZone": {
+      "Type": "String"
+    },
     "AppWildcardDomain": {
       "Type": "String"
     },
@@ -928,6 +931,31 @@
         "Bastion",
         "MasterExtElb"
       ],
+       "Properties": {
+        "HostedZoneName": { "Ref": "Route53AppHostedZone" },
+        "RecordSets": [
+          {
+            "Name": { "Ref": "AppWildcardDomain" },
+            "Type": "A",
+            "AliasTarget": {
+                "HostedZoneId": { "Fn::GetAtt" : ["InfraElb", "CanonicalHostedZoneNameID"] },
+                "DNSName": { "Fn::GetAtt" : ["InfraElb","CanonicalHostedZoneName"] }
+            }
+          }
+        ]
+      }
+    },
+    "Route53Records": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "DependsOn": [
+        "InfraElb",
+        "MasterIntElb",
+        "Master01",
+        "Master02",
+        "Master03",
+        "Bastion",
+        "MasterExtElb"
+      ],
       "Properties": {
         "HostedZoneName": { "Ref": "Route53HostedZone" },
         "RecordSets": [
@@ -945,14 +973,6 @@
             "AliasTarget": {
                 "HostedZoneId": { "Fn::GetAtt" : ["MasterIntElb", "CanonicalHostedZoneNameID"] },
                 "DNSName": { "Fn::GetAtt" : ["MasterIntElb","DNSName"] }
-            }
-          },
-          {
-            "Name": { "Ref": "AppWildcardDomain" },
-            "Type": "A",
-            "AliasTarget": {
-                "HostedZoneId": { "Fn::GetAtt" : ["InfraElb", "CanonicalHostedZoneNameID"] },
-                "DNSName": { "Fn::GetAtt" : ["InfraElb","CanonicalHostedZoneName"] }
             }
           },
           {
