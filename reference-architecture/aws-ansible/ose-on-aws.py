@@ -57,8 +57,7 @@ import sys
 
 ### DNS options
 @click.option('--public-hosted-zone', help='hosted zone for accessing the environment')
-@click.option('--app-dns-prefix', default='apps', help='application dns prefix',
-              show_default=True)
+@click.option('--app-hosted-zone', help='application zone for hosting usr apps')
 
 
 ### Subscription and Software options
@@ -75,9 +74,6 @@ import sys
 @click.option('--containerized', default='False', help='Containerized installation of OpenShift',
               show_default=True)
 @click.option('--s3-bucket-name', help='Bucket name for S3 for registry')
-@click.option('--github-client-id', help='GitHub OAuth ClientID')
-@click.option('--github-client-secret', help='GitHub OAuth Client Secret')
-@click.option('--github-organization', multiple=True, help='GitHub Organization')
 @click.option('--s3-username',  help='S3 user for registry access')
 @click.option('--openshift-metrics-deploy',  help='Deploy OpenShift Metrics', type=click.Choice(['true', 'false']), default='true')
 @click.option('--openshift-logging-deploy',  help='Deploy OpenShift Logging', type=click.Choice(['true', 'false']), default='true')
@@ -113,7 +109,7 @@ def launch_refarch_env(region=None,
                     byo_bastion=None,
                     bastion_sg=None,
                     public_hosted_zone=None,
-                    app_dns_prefix=None,
+                    app_hosted_zone=None,
                     deployment_type=None,
                     openshift_sdn=None,
                     console_port=443,
@@ -123,9 +119,6 @@ def launch_refarch_env(region=None,
                     containerized=None,
                     s3_bucket_name=None,
                     s3_username=None,
-                    github_client_id=None,
-                    github_client_secret=None,
-                    github_organization=None,
                     openshift_metrics_deploy=None,
                     openshift_metrics_storage_volume_size=None,
                     openshift_logging_deploy=None,
@@ -135,6 +128,9 @@ def launch_refarch_env(region=None,
   # Need to prompt for the R53 zone:
   if public_hosted_zone is None:
     public_hosted_zone = click.prompt('Hosted DNS zone for accessing the environment')
+
+  if app_hosted_zone is None:
+    app_hosted_zone = click.prompt('Application hosted DNS zone for user apps')
 
   if s3_bucket_name is None:
     s3_bucket_name = stack_name + '-ocp-registry-' + public_hosted_zone.split('.')[0]
@@ -187,21 +183,6 @@ def launch_refarch_env(region=None,
   if deployment_type in ['openshift-enterprise'] and rhsm_pool is None:
     rhsm_pool = click.prompt("RHSM Pool ID or Subscription Name?")
 
-  # Calculate various DNS values
-  wildcard_zone="%s.%s" % (app_dns_prefix, public_hosted_zone)
-
-  # GitHub Authentication
-  if github_organization is None or not github_organization:
-    click.echo('A GitHub organization must be provided')
-    sys.exit(1)
-  if github_client_id is None:
-    github_client_id = click.prompt('Specify the ClientID for GitHub OAuth')
-  if github_client_secret is None:
-    github_client_secret = click.prompt('Specify the Client Secret for GitHub OAuth')
-
-  if isinstance(github_organization, str) or isinstance(github_organization, unicode):
-    github_organization = [github_organization]
-
   deploy_glusterfs = "false"
 
   # Display information to the user about their choices
@@ -231,14 +212,10 @@ def launch_refarch_env(region=None,
   click.echo('\tdeployment_type: %s' % deployment_type)
   click.echo('\topenshift_sdn: %s' % openshift_sdn)
   click.echo('\tpublic_hosted_zone: %s' % public_hosted_zone)
-  click.echo('\tapp_dns_prefix: %s' % app_dns_prefix)
-  click.echo('\tapps_dns: %s' % wildcard_zone)
+  click.echo('\tapp_hosted_zone: %s' % app_hosted_zone)
   click.echo('\tcontainerized: %s' % containerized)
   click.echo('\ts3_bucket_name: %s' % s3_bucket_name)
   click.echo('\ts3_username: %s' % s3_username)
-  click.echo('\tgithub_client_id: *******')
-  click.echo('\tgithub_client_secret: *******')
-  click.echo('\tgithub_organization: %s' % (','.join(github_organization)))
   click.echo('\topenshift_metrics_deploy: %s' % openshift_metrics_deploy)
   click.echo('\topenshift_metrics_storage_volume_size: %s' % openshift_metrics_storage_volume_size)
   click.echo('\topenshift_logging_deploy: %s' % openshift_logging_deploy)
@@ -292,7 +269,7 @@ def launch_refarch_env(region=None,
     app_node_count=%d \
     bastion_instance_type=%s \
     public_hosted_zone=%s \
-    wildcard_zone=%s \
+    app_hosted_zone=%s \
     console_port=%s \
     deployment_type=%s \
     openshift_sdn=%s \
@@ -302,9 +279,6 @@ def launch_refarch_env(region=None,
     containerized=%s \
     s3_bucket_name=%s \
     s3_username=%s \
-    github_client_id=%s \
-    github_client_secret=%s \
-    github_organization=%s \
     deploy_glusterfs=%s \
     openshift_hosted_metrics_deploy=%s \
     openshift_hosted_metrics_storage_volume_size=%s \
@@ -331,7 +305,7 @@ def launch_refarch_env(region=None,
                     int(app_node_count),
                     bastion_instance_type,
                     public_hosted_zone,
-                    wildcard_zone,
+                    app_hosted_zone,
                     console_port,
                     deployment_type,
                     openshift_sdn,
@@ -341,9 +315,6 @@ def launch_refarch_env(region=None,
                     containerized,
                     s3_bucket_name,
                     s3_username,
-                    github_client_id,
-                    github_client_secret,
-                    str(map(lambda x: x.encode('utf8'), github_organization)).replace("'", '"').replace(' ', ''),
                     deploy_glusterfs,
                     openshift_metrics_deploy,
                     openshift_metrics_storage_volume_size,
