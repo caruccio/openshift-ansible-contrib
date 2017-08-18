@@ -16,6 +16,7 @@ fs_setup:
 runcmd:
 - mkdir -p /var/lib/etcd
 - mkdir -p /var/lib/origin/openshift.local.volumes
+- sed -i 's/Defaults\s\+requiretty/Defaults !requiretty/g' /etc/sudoers
 
 mounts:
 - [ /dev/xvdc, /var/lib/etcd, xfs, "defaults" ]
@@ -27,8 +28,6 @@ write_files:
     VG=docker_vol
     DATA_SIZE=95%VG
     STORAGE_DRIVER=devicemapper
-    ROOT_SIZE=45G
-    GROWPART=true
     EXTRA_DOCKER_STORAGE_OPTIONS='--storage-driver devicemapper --storage-opt dm.fs=xfs --storage-opt dm.thinpooldev=/dev/mapper/docker_vg-docker--pool'
   path: /etc/sysconfig/docker-storage-setup
   owner: root:root

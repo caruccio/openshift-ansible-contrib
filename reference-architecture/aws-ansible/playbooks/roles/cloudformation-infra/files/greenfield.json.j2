@@ -1034,7 +1034,7 @@
           "ImageId" : {"Ref": "AmiId"},
           "UserData": {"Ref": "BastionUserData"},
           "KeyName" : {"Ref": "KeyName"},
-	  "InstanceType": {"Ref": "BastionInstanceType"},
+	        "InstanceType": {"Ref": "BastionInstanceType"},
           "SecurityGroupIds": [{ "Fn::GetAtt" : ["BastionSg", "GroupId"] }],
           "SubnetId" : {"Ref": "PublicSubnet1"},
           "Tags": [
@@ -1043,13 +1043,13 @@
             }
           ],
           "BlockDeviceMappings" : [
-			          {
-            "DeviceName": "/dev/sda1",
-            "Ebs": {
-              "DeleteOnTermination": "true",
-              "VolumeSize": {"Ref": "BastionRootVolSize"},
-              "VolumeType": {"Ref": "BastionRootVolType"}
-                   }
+			      {
+              "DeviceName": "/dev/sda1",
+              "Ebs": {
+                "DeleteOnTermination": "true",
+                "VolumeSize": {"Ref": "BastionRootVolSize"},
+                "VolumeType": {"Ref": "BastionRootVolType"}
+              }
             }
           ]
        }
@@ -1185,8 +1185,8 @@
           "ImageId" : {"Ref": "AmiId"},
           "UserData": {"Ref": "MasterUserData"},
           "KeyName" : {"Ref": "KeyName"},
-	  "InstanceType": {"Ref": "MasterInstanceType"},
-	  "SecurityGroupIds": [{ "Fn::GetAtt" : ["NodeSG", "GroupId"] }, { "Fn::GetAtt" : ["MasterSG", "GroupId"] }, { "Fn::GetAtt" : ["EtcdSG", "GroupId"] }],
+	        "InstanceType": {"Ref": "MasterInstanceType"},
+	        "SecurityGroupIds": [{ "Fn::GetAtt" : ["NodeSG", "GroupId"] }, { "Fn::GetAtt" : ["MasterSG", "GroupId"] }, { "Fn::GetAtt" : ["EtcdSG", "GroupId"] }],
           "SubnetId" : {"Ref": "PrivateSubnet3"},
           "IamInstanceProfile": { "Ref": "MasterInstanceProfile" },
           "Tags": [

@@ -246,14 +246,7 @@ def launch_refarch_env(region=None,
     command='rm -rf .ansible/cached_facts'
     os.system(command)
 
-    try:
-      extra_params = open('extra.ini').read()
-      click.echo('Loading extra.ini')
-    except:
-      extra_params = ''
-
-    command='ansible-playbook -i inventory/aws/hosts -e \'%s\
-    region=%s \
+    command='ansible-playbook -i inventory/aws/hosts -e \'region=%s \
     stack_name=%s \
     ami=%s \
     keypair=%s \
@@ -291,8 +284,7 @@ def launch_refarch_env(region=None,
     openshift_hosted_metrics_deploy=%s \
     openshift_hosted_metrics_storage_volume_size=%s \
     openshift_hosted_logging_deploy=%s \
-    openshift_hosted_logging_storage_volume_size=%s \' %s' % (extra_params,
-                    region,
+    openshift_hosted_logging_storage_volume_size=%s \' %s' % (region,
                     stack_name,
                     ami,
                     keypair,
